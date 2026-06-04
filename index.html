@@ -45,7 +45,36 @@
     padding: 14px 18px 10px;
   }
   h1 { margin: 0; font-size: 19px; line-height: 1.2; }
-  .date { color: var(--muted); font-size: 12px; margin-top: 3px; }
+  .title-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .calendar-card {
+    display: grid;
+    grid-template-columns: 48px 1fr;
+    align-items: stretch;
+    min-width: 160px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fff;
+  }
+  .calendar-day {
+    display: grid;
+    place-items: center;
+    background: var(--blue);
+    color: #fff;
+    font-size: 24px;
+    font-weight: 900;
+  }
+  .calendar-meta {
+    display: grid;
+    gap: 2px;
+    padding: 7px 10px;
+  }
+  .calendar-week { color: var(--ink); font-size: 13px; font-weight: 800; }
+  .calendar-full { color: var(--muted); font-size: 12px; white-space: nowrap; }
   .tabs {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -191,15 +220,24 @@
     .span-4, .span-5, .span-7, .span-8, .span-12 { grid-column: auto; }
     .split, .searchbar { grid-template-columns: 1fr; }
     .tabs { grid-template-columns: repeat(2, 1fr); }
+    .topbar { align-items: flex-start; }
+    .title-row { align-items: flex-start; flex-direction: column; gap: 8px; }
+    .calendar-card { min-width: 176px; }
   }
 </style>
 </head>
 <body>
 <header>
   <div class="topbar">
-    <div>
+    <div class="title-row">
       <h1>K12小红书执行台</h1>
-      <div class="date" id="todayText"></div>
+      <div class="calendar-card" aria-label="今日日期">
+        <div class="calendar-day" id="calendarDay"></div>
+        <div class="calendar-meta">
+          <div class="calendar-week" id="calendarWeek"></div>
+          <div class="calendar-full" id="calendarFull"></div>
+        </div>
+      </div>
     </div>
     <button class="btn primary" id="quickPostBtn">生成今日笔记</button>
   </div>
@@ -591,7 +629,10 @@ function switchTab(id) {
 document.querySelectorAll(".tab").forEach(btn => btn.addEventListener("click", () => switchTab(btn.dataset.tab)));
 document.getElementById("quickPostBtn").addEventListener("click", () => { switchTab("today"); generateDraft(); });
 document.getElementById("postDate").value = todayISO();
-document.getElementById("todayText").textContent = new Date().toLocaleDateString("zh-CN", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
+const now = new Date();
+document.getElementById("calendarDay").textContent = String(now.getDate()).padStart(2, "0");
+document.getElementById("calendarWeek").textContent = now.toLocaleDateString("zh-CN", { weekday: "long" });
+document.getElementById("calendarFull").textContent = now.toLocaleDateString("zh-CN", { year: "numeric", month: "long" });
 generateDraft();
 renderAll();
 
